@@ -3,18 +3,27 @@
 #include <Windows.h>
 
 #define LOG
+// timed parse is faster and more accurate without DBG
 #define DBG
+
+#define timeofflog(str, ...) \
+	{ \
+		uni __off; \
+		__off.ull = __rdtsc(); \
+		printf(str, __VA_ARGS__); \
+		now.ull += __rdtsc() - __off.ull; \
+	}
 
 #ifdef LOG
 #define log(str, ...) \
-		printf(str, __VA_ARGS__)
+	timeofflog(str, __VA_ARGS__)
 #else 
-#define dbglog(str, ...)
+#define log(str, ...)
 #endif
 
 #ifdef DBG
 #define dbglog(str, ...) \
-		printf(str, __VA_ARGS__)
+	timeofflog(str, __VA_ARGS__)
 #else 
 #define dbglog(str, ...)
 #endif
@@ -156,6 +165,7 @@ void (*fops[11])() = { _nop, _oriori, _nexori, _orinex, _nexnex, _nexexe, _exene
 
 #define cmatch(l, r) \
 	(__lzcnt64(l ^ r) >> 6)
+// <<<
 
 #define nonalphanumerical(ap) \
 	((cdref(ap) < 'a' || cdref(ap) > 'z') && (cdref(ap) < 'A' || cdref(ap) > 'Z') && (cdref(ap) < '0' || cdref(ap) > '9'))
@@ -208,15 +218,17 @@ char enginecoretext[] =
 
 #define ENGINE_SIZ sizeof(enginecoretext)
 
+uni now;
+
 void _nop() {}
 constructoproute(oriori)
-
+	
 }
 constructoproute(nexori)
-
+	
 }
 constructoproute(orinex)
-
+	
 }
 constructoproute(nexnex)
 
@@ -255,7 +267,6 @@ int main()
 	vpref(orinode) = node;
 	cpref(next) = enginecoretext;
 
-	uni now;
 	now.ull = __rdtsc();
 
 nextrun:
