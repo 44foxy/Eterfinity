@@ -2,36 +2,42 @@
 
 // currently expanding / experimenting >>>----------------------------------------------------->>>
 
-// memory layout >>>
-	// testing >>>
-		#define	REG0 0
-		#define	REG1 1
-		#define	REG2 2
-		#define	REG3 4
-		#define	REG4 5
-		#define	REG5 6
-		#define	REG6 7
-		#define	REG7 8
-	// <<<
-	#define infi_pos_jump 32
-	#define infi_pos_heap 33
-	#define infi_pos_reinitcnt 34
-	#define infi_pos_timer 35
-	#define infi_pos_fncdata 64
-	#define infi_pos_usrdata 128
-// <<<
-
 // execution layout >>>
 	typedef enum eop
 	{
-		start = infi_pos_fncdata,
-		infinity_memget_fail,
-		fail,
-		fail_input,
-		reinitialize,
-		clean,
-		exe_test_1,
-		exe_test_2,
-		exe_test_3,
+		op_start,
+		op_infinity_memget_fail,
+		op_fail,
+		op_fail_input,
+		op_reinitialize,
+		op_clean,
+		op_start_http_server,
+		op_frequency_sweep,
+		op_test,
+		op_test_1,
+		op_null
+	}eop;
+// <<<
+
+// infinity layout >>>
+	typedef enum einfilayout
+	{
+		// infinity processor section
+		REG0,
+		REG1,
+		REG2,
+		REG3,
+		REG4,
+		REG5,
+		REG6,
+		REG7,
+		// internal section
+		heap = 64,
+		reinit_count,
+		timer,
+		// data section
+		dat_socket_http_server = 128,
+		dat_test_var,
+		dat_reinit_count,
 	}eop;
 // <<<

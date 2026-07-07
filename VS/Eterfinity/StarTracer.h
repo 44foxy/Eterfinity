@@ -152,43 +152,22 @@
 // currently expanding / experimenting >>>----------------------------------------------------->>>
 
 // StarTracer jump section >>>
-	#define jump_build(name) \
-		void ___##name()
+	#define jump_imprint(name) \
+		___##name:
 
-	#define jump_link(name) \
-		extern void ___##name();\
-		ullref(infinity[name]) = ___##name;
+	#define jump_phase(name) \
+		goto ___##name
 
-	#define jump_acc \
-		ullref(infinity[infi_pos_jump])
-
-	#define jump_set_if_zero(cmd, route) \
-		jump_acc |= (~!jump_acc + 1ull) & (~cmd + 1ull) & route
-
-	#define jumpzero \
-		jump_acc = 0
-
-	#define jump_set(x) \
-		jump_acc = x
-
-	#define jump_to_decision(name) \
-		jump_set_if_zero(!!infi_reinit_cnt_acc, reinitialize); \
-		jump_set_if_zero(1, fail); \
-		infinity[jump_acc].fp(); \
-		goto name
+	#define jump_if(cmd, route) \
+		if(cmd) goto ___##route
 // <<<
 
 // virtual memory access >>>
-	#define infi_user_acc(pos, type) \
-		infinity[infi_pos_usrdata + pos].type
-
-	#define infi_heap infinity[infi_pos_heap]
-
-	#define infi_heap_acc(pos, type) \
-		((yufi*)&infinity[infi_pos_heap].llp[pos])->type
-
-	#define timer_acc \
-		ullref(infinity[infi_pos_timer])
+	#define infi_get(pos)				infinity[pos]
+	#define infi_acc(pos, type)			infi_get(pos).type
+	#define infi_heap					infi_get(heap)
+	#define infi_heap_acc(pos, type)	((yufi*)&infi_acc(heap, llp)[pos])->type
+	#define infi_timer					infi_acc(timer, ull)
 // <<<
 
 // reinitialization capability (for profiling sustained compute) >>>
@@ -196,5 +175,5 @@
 		1'000'000
 
 	#define infi_reinit_cnt_acc \
-		ullref(infinity[infi_pos_reinitcnt])
+		ullref(infinity[reinit_count])
 // <<<

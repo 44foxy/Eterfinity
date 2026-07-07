@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c" />
     <ClCompile Include="server.c" />
     <ClCompile Include="StarTracer.c" />
   </ItemGroup>

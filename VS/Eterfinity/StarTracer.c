@@ -1,87 +1,95 @@
-#include "startracer.h"
+#include "StarTracer.h"
 
 yufi infinity[infinity_size] = { 0 };
 
-jump_build(start)
+//#define __overhead_test__
+//#define __deploy__
+
+int main()
 {
-	WSADATA wsa;
-	WSAStartup(MAKEWORD(2, 2), &wsa);
+// <<<--------------------------------------->>>
+	jump_imprint(decide)
+		jump_if(!vpref(infi_heap), op_start);
+		jump_if(!infi_acc(dat_reinit_count, ull), op_frequency_sweep);
+#ifdef __overhead_test__
+		jump_if(infi_acc(dat_reinit_count, ull)--, op_null);
+#elif !__deploy__
+		jump_if(!infi_acc(dat_test_var, ull), op_test);
+		jump_if(infi_acc(dat_test_var, ull), op_test_1);
+#else
 
-	SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
-	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
-	
-	infi* affinityMask = 1llu << 0;
-	SetProcessAffinityMask(GetCurrentProcess(), affinityMask);
+#endif
+	jump_phase(decide);
+// <<<--------------------------------------->>>
+// >>>
+	jump_imprint(op_start)
+		WSADATA wsa;
+		WSAStartup(MAKEWORD(2, 2), &wsa);
 
-	_memget_(infi_heap, infinity_heap_size);
-	_memset_(vpref(infi_heap), 0, infinity_heap_size);
-	
-	jumpzero;
-	jump_set_if_zero(!!vpref(infi_heap), reinitialize);
-	jump_set_if_zero(1, infinity_memget_fail);
-	
-	infi_reinit_cnt_acc = reinit_cnt;
-	infi_reinit_cnt_acc++;
-	
-	timer_acc = __rdtsc();
-}
+		SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 
-jump_build(infinity_memget_fail)
-{
-	log("Failed allocating memory space, exiting :::>>>\n");
-	ExitProcess(1);
-}
+		infi* affinityMask = 1llu << 0;
+		SetProcessAffinityMask(GetCurrentProcess(), affinityMask);
 
-jump_build(fail)
-{
-	log("Fail --- average cycle count per reinitialization: %llu  :::>>>\n", ((__rdtsc() - timer_acc) / reinit_cnt));
-	infi_reinit_cnt_acc = reinit_cnt;
-	infi_reinit_cnt_acc++;
-	jump_set(fail_input);
-}
+		_memget_(infi_heap, infinity_heap_size);
+		_memset_(vpref(infi_heap), 0, infinity_heap_size);
 
-jump_build(fail_input)
-{
-	jumpzero;
-	jump_set_if_zero(KEY_CODE_0, reinitialize);
-	jump_set_if_zero(KEY_CODE_ESC, clean);
-	jump_set_if_zero(1, fail_input);
-	delay(20);
-	timer_acc = __rdtsc();
-}
+		jump_if(!vpref(infi_heap), op_infinity_memget_fail);
 
-jump_build(reinitialize)
-{
-	infi_user_acc(0, ull) = 0; // test harness - opt
-	infi_reinit_cnt_acc--;
-	jumpzero;
-}
-
-jump_build(clean)
-{ 
-	log("Exiting :::>>>\n");
-	free(vpref(infi_heap));
-	WSACleanup();
-	ExitProcess(0);
-}
-
-jump_build(exe_test_1)
-{
-	dbglog("Executed test route 1 >>>\n");
-	infi_user_acc(0, ull)++;
-	jumpzero;
-}
-
-jump_build(exe_test_2)
-{
-	dbglog("Executed test route 2 >>>\n");
-	infi_user_acc(0, ull)++;
-	jumpzero;
-}
-
-jump_build(exe_test_3)
-{
-	dbglog("Executed test route 3 >>>\n");
-	infi_user_acc(0, ull)++;
-	jumpzero;
+		infi_timer = __rdtsc();
+	jump_phase(op_reinitialize);
+// <<<
+// >>>
+	jump_imprint(op_reinitialize)
+		infi_acc(dat_reinit_count, ull) = reinit_cnt;
+		infi_timer = __rdtsc();
+	jump_phase(decide);
+// <<<
+// >>>
+	jump_imprint(op_infinity_memget_fail)
+		log("Failed allocating memory space, exiting :::>>>\n");
+		ExitProcess(1);
+	jump_phase(decide);
+// <<<
+// >>>
+	jump_imprint(op_frequency_sweep)
+		infi_timer = ((__rdtsc() - infi_timer) / reinit_cnt);
+		// AMD Ryzen 7 5800X 3.8GHz
+		// __overhead__ => Frequency sweep: 1.90000e+09 Hz | cycle count: 2
+		// !__overhead__ => Frequency sweep: 7.60000e+08 Hz | cycle count: 5 <OR> Frequency sweep: 6.33333e+08 Hz | cycle count: 6
+		log("Frequency sweep: %.5e Hz | cycle count: %llu\n", 3.8e9 / infi_timer, infi_timer);
+		jump_imprint(freq_input)
+			jump_if(KEY_CODE_ESC, op_clean);
+#ifdef __overhead_test__
+			jump_if(1, op_reinitialize);
+#else
+			jump_if(KEY_CODE_0, op_reinitialize);
+#endif
+	jump_phase(freq_input);
+// <<<
+// >>>
+	jump_imprint(op_test)
+		infi_acc(dat_reinit_count, ull)--;
+		infi_acc(dat_test_var, ull) = !infi_acc(dat_test_var, ull);
+	jump_phase(decide);
+// <<<
+// >>>
+	jump_imprint(op_test_1)
+		infi_acc(dat_test_var, ull) = !infi_acc(dat_test_var, ull);
+	jump_phase(decide);
+// <<<
+// >>>
+	jump_imprint(op_clean)
+		log("Exiting :::>>>\n");
+		free(vpref(infi_heap));
+		WSACleanup();
+		ExitProcess(0);
+	jump_phase(decide);
+// <<<
+// >>>
+	jump_imprint(op_null)
+		infi_acc(dat_test_var, ull)++;
+	jump_phase(decide);
+// <<<
 }
